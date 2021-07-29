@@ -6,7 +6,7 @@ use App\Models\Products;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
-class ProcutsPolicy
+class ProductsPolicy
 {
     use HandlesAuthorization;
 
@@ -22,6 +22,6 @@ class ProcutsPolicy
 
     public function update(User $user, Products $product)
     {
-        # code...
+        return $user->id == $product->owner;
     }
 }
