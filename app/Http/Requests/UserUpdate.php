@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 
-class PassReset extends FormRequest
+class UserUpdate extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,8 +25,8 @@ class PassReset extends FormRequest
     public function rules()
     {
         return [
-            'old_password' => 'required|current_password',
-            'new_password' => 'required|string|min:8',
+            'name' => 'string|max:50',
+            'email' => 'email|users:unique'
         ];
     }
 }

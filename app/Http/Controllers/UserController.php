@@ -42,15 +42,27 @@ class UserController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->passowrd),
         ]);
-        return response()->json(['user' => $user]);
+        $user->token = $user->createToken('assignment')->plainTextToken;
+        $user->sendVerificationMail();
+        return response()->json(['user' => $user, 'message' => 'verification link has been sent to your email']);
+    }
+    public function updateUserInfo(Request $request)
+    {
+        $user = $request->user();
+        $user->name = $request->name ?? $user->name;
+        $request->user()->sendEmailVerificationNotification();
+        if ($request->email) {
+            $user->email = $request->email;
+        }
+        $user->save();
     }
     public function changePassword(PassReset $request)
     {
-        $request->user->forceFill([
+        $user = $request->user()->forceFill([
             'password' => Hash::make($request->new_password),
         ]);
-        $request->user->tokens()->delete();
-        $request->user->save();
+        $user->tokens()->delete();
+        $user->save();
         return response()->json(['message' => 'Password has been changed']);
     }
 
@@ -61,7 +73,7 @@ class UserController extends Controller
     }
     public function sendVerificationMail(Request $request)
     {
-        $request->user()->sendVerificationMail();
+        $request->user()->sendEmailVerificationNotification();
         return response()->json(['message' => 'Email verification link sent']);
     }
     
