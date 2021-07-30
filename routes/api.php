@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-Route::get('/email/verify/{id}/{hash}', [UserController::class, 'verifyEmail'])->middleware(['auth','signed'])->name('verification.verify');
+Route::get('/email/verify/{user}/{code}', [UserController::class, 'verifyEmail'])->name('verification.verify');
 
 Route::get('/products', [ProductController::class, 'index'])->name('products');
 Route::get('/products/{product}', [ProductController::class, 'getProduct'])->name('product');
@@ -32,7 +32,9 @@ Route::middleware(['auth:sanctum'])->group(function(){
         //update
         Route::put('/update', [UserController::class, 'updateUserInfo'])->name('update.user');
         Route::put('/update/password',[UserController::class, 'changePassword'])->name('update.password');
-        
+
+        //verification
+        Route::get('/email/verify',[UserController::class, 'sendVerificationMail'])->name('verification.mail');
     });
     
     Route::prefix('product')->group(function(){

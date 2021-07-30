@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use App\Http\Requests\PassReset;
 use App\Http\Requests\UserCreator;
 use App\Models\User;
+use App\Notifications\Verificationurl;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\ValidationException;
@@ -43,14 +45,14 @@ class UserController extends Controller
             'password' => Hash::make($request->passowrd),
         ]);
         $user->token = $user->createToken('assignment')->plainTextToken;
-        $user->sendVerificationMail();
+        $user->verificationNotification();
         return response()->json(['user' => $user, 'message' => 'verification link has been sent to your email']);
     }
     public function updateUserInfo(Request $request)
     {
         $user = $request->user();
         $user->name = $request->name ?? $user->name;
-        $request->user()->sendEmailVerificationNotification();
+        $request->user()->verificationNotification();
         if ($request->email) {
             $user->email = $request->email;
         }
@@ -66,14 +68,18 @@ class UserController extends Controller
         return response()->json(['message' => 'Password has been changed']);
     }
 
-    public function verifyEmail(EmailVerificationRequest $request)
+    public function verifyEmail(Request $request, User $user, $code)
     {
-        $request->fulfill();
-        return response()->json(['user' => $request->user(), 'message' => 'Your email has been verified']);
+        $value = Cache::store('database')->pull($user->id . 'email_verify_code');
+        if (!$value || $value !== $code) {
+            return response()->json(['message' => 'url is invalid'], 400);
+        }
+        $user->markEmailAsVerified();
+        return response()->json(['message' => 'Your email is verified now']);
     }
     public function sendVerificationMail(Request $request)
     {
-        $request->user()->sendEmailVerificationNotification();
+        $request->user()->verificationNotification();
         return response()->json(['message' => 'Email verification link sent']);
     }
     

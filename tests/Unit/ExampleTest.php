@@ -2,7 +2,8 @@
 
 namespace Tests\Unit;
 
-use PHPUnit\Framework\TestCase;
+use Illuminate\Support\Facades\Cache;
+use Tests\TestCase;
 
 class ExampleTest extends TestCase
 {
@@ -13,6 +14,8 @@ class ExampleTest extends TestCase
      */
     public function test_example()
     {
+        // Cache::store('database')->put('email_verification_code', '55001', now()->addSecond(50));
+        // dump(Cache::store('database')->get('email_verification_code'));
         $this->assertTrue(true);
     }
 }
