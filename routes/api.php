@@ -16,6 +16,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 Route::get('/email/verify/{user}/{code}', [UserController::class, 'verifyEmail'])->name('verification.verify');
+Route::post('/forgot-password', [UserController::class, 'forgotPassword'])->name('password.email');
+Route::post('/reset-password', [UserController::class, 'resetPassword'])->name('password.update');
 
 Route::get('/products', [ProductController::class, 'index'])->name('products');
 Route::get('/products/{product}', [ProductController::class, 'getProduct'])->name('product');
@@ -33,6 +35,8 @@ Route::middleware(['auth:sanctum'])->group(function(){
         Route::put('/update', [UserController::class, 'updateUserInfo'])->name('update.user');
         Route::put('/update/password',[UserController::class, 'changePassword'])->name('update.password');
 
+        //logout
+        Route::post('/logout', [UserController::class, 'logout'])->name('user.logout');
         //verification
         Route::get('/email/verify',[UserController::class, 'sendVerificationMail'])->name('verification.mail');
     });
@@ -42,9 +46,9 @@ Route::middleware(['auth:sanctum'])->group(function(){
         Route::post('/create', [ProductController::class, 'createProduct'])->name('product.create');
 
         //update
-        Route::put('/update', [ProductController::class, 'updateProduct'])->name('product.update');
+        Route::put('/update/{product}', [ProductController::class, 'updateProduct'])->name('product.update');
         //delete
-        Route::delete('/delete', [ProductController::class, 'deleteProduct'])->name('product.delete');
+        Route::delete('/delete/{product}', [ProductController::class, 'deleteProduct'])->name('product.delete');
 
     });
 });

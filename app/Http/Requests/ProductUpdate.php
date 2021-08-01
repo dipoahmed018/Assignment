@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Log;
 
 class ProductUpdate extends FormRequest
 {
@@ -25,9 +26,9 @@ class ProductUpdate extends FormRequest
     {
         return [
             'title' => 'string|min:5|max:250',
-            'description' => 'string|min:20|max:500',
+            'description' => 'string|min:20|max:1500',
             'price' => 'integer|min:1|max:10000',
-            'image' => 'required|mimes:jpg,png,jpeg',
+            'image' => 'mimes:jpg,png,jpeg',
         ];
     }
 }

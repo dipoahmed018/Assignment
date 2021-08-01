@@ -2,11 +2,10 @@
 
 namespace App\Notifications;
 
-use App\Mail\VerficationMail;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Support\Facades\Log;
 
 class Verificationurl extends Notification
 {
@@ -17,9 +16,10 @@ class Verificationurl extends Notification
      *
      * @return void
      */
-    public function __construct()
+    public $url;
+    public function __construct($url)
     {
-        //
+        $this->url = $url;
     }
 
     /**
@@ -41,7 +41,10 @@ class Verificationurl extends Notification
      */
     public function toMail($notifiable)
     {
-        return (new VerficationMail($notifiable->url));
+        return (new MailMessage)->view(
+            'mail.email_verify',
+            ['url' => $this->url]
+        );
     }
 
     /**

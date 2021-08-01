@@ -18,7 +18,7 @@ class UserController extends Controller
 {
     public function userInfo(Request $request)
     {
-        return $request->user();
+        return response()->json($request->user(), 200) ;
     }
     public function login(Request $request)
     {
@@ -34,7 +34,12 @@ class UserController extends Controller
         }
         $user->tokens()->delete();
         $user->token = $user->createToken('assignment')->plainTextToken;
-        return response()->json(['user' => $user]);
+        return response()->json($user);
+    }
+    public function logout(Request $request)
+    {
+        $request->user()->tokens()->delete();
+        response()->json('logout successful', 200);
     }
     public function register(UserCreator $request)
     {
@@ -52,11 +57,12 @@ class UserController extends Controller
     {
         $user = $request->user();
         $user->name = $request->name ?? $user->name;
-        $request->user()->verificationNotification();
         if ($request->email) {
             $user->email = $request->email;
+            $user->email_verified_at = null;
+            $request->user()->verificationNotification();
         }
-        $user->save();
+        return $user->save();
     }
     public function changePassword(PassReset $request)
     {
@@ -70,7 +76,7 @@ class UserController extends Controller
 
     public function verifyEmail(Request $request, User $user, $code)
     {
-        $value = Cache::store('database')->pull($user->id . 'email_verify_code');
+        $value = Cache::store('database')->pull($user->id . '_email_verification_code');
         if (!$value || $value !== $code) {
             return response()->json(['message' => 'url is invalid'], 400);
         }
@@ -116,6 +122,6 @@ class UserController extends Controller
                 event(new PasswordReset($user));
             }
         );
-        return $status === Password::PASSWORD_RESET ? response()->json(['status' => $status]) : response()->json(['errors' => $status],422);
+        return $status === Password::PASSWORD_RESET ? response()->json(['status' => __($status)]) : response()->json(['errors' => __($status)],422);
     }
 }
